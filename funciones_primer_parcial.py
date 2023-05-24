@@ -25,7 +25,9 @@ def menu_de_opciones() -> str:
     | 7. Guardar en Formato JSON              |
     | 8. Leer desde Formato JSON              |
     | 9. Actualizar Precios                   |
-    | 10. Salir                               |
+    | 10. Agregar Producto                    |
+    | 11. Guardar en formato csv o json       |
+    | 12. Salir                               |
     |-----------------------------------------|
     """)
 
@@ -649,8 +651,9 @@ def actualizar_precios(lista_insumos) -> None:
     Recorre la lista de los precios actualizados y con la funcion map se obtiene una nueva lista de 
     diccionarios de los insumos con sus precios actualizados 
     Por ultimo genera un nuevo archivo csv con los insumos actualizados 
-    No retorna nada
+
     """
+  
 
     if len(lista_insumos) < 0 or type(lista_insumos) != list:
         print("La lista esta vacia o no es de tipo lista")
@@ -666,11 +669,180 @@ def actualizar_precios(lista_insumos) -> None:
             for producto in productos_actualizados:
                 linea = f"{producto['id']},{producto['nombre']},{producto['marca']},{producto['precio']},{producto['caracteristicas']}\n"
                 file.write(linea)
+        
+        
+
+
 
 
 
 
 # 10
+
+def cargar_marcas() -> list:
+
+    """_summary_
+    La funcion lee un archivo txt y lo transforma a lista
+    Returns:
+        _list_: Retorna la lista de marcas
+    """
+    with open("marcas.txt", "r") as file:
+        marcas = file.readlines()
+        for i in range(len(marcas)):
+            marcas[i] = marcas[i].replace("\n","")
+        return marcas
+
+
+
+def mostrar_marcas(lista:list) -> None:
+
+    """_summary_
+    La funcion valida que la lista no este vacia y sea de tipo list
+    y muestra la lista de marcas
+    No retorna nada
+    """
+
+    if type(lista) != list or len(lista) <= 0:
+        print("Esta lista esta vacia o no es de tipo lista")
+    
+    else:
+
+        print("---------------------------------------")
+        print("          LISTA DE MARCAS              ")
+        print("---------------------------------------")
+        for marca in lista:
+            print(marca)
+        
+
+
+def agregar_producto(lista_insumos:list) -> None:
+
+    """_summary_
+    La funcion valida que la lista no este vacia y sea de tipo list
+    Pide id, nombre,marca,precio,caracteristicas (todo validado)
+    y suma a la lista de insumos un nuevo producto
+    No retorna nada
+    """
+
+    if type(lista_insumos) != list or len(lista_insumos) <= 0:
+        print("Esta lista esta vacia o no es de tipo lista")
+    else:
+
+        caracteristicas = []
+        
+
+        while True:
+            try:
+                encontrado = False
+                id = int(input("Ingrese Id: "))
+                for insumo in lista_insumos:
+                    if insumo["id"] == id:
+                        encontrado = True
+                        break
+                if encontrado:
+                    print("El ID ya está en la lista.")
+                else:
+                    break
+            except ValueError:
+                print("Lo ingresado no es un numero")
+
+        while True:
+            producto = input("Ingrese un Producto: ")
+            if len(producto) > 2:
+                producto = producto.capitalize()
+                break
+            else:
+                print("El nombre debe contener mas de dos caracteres")
+        
+            
+        lista_marcas = cargar_marcas()
+        mostrar_marcas(lista_marcas)
+
+        while True:
+            marca = input("Ingrese una marca: ")
+            marca = capitalizar_palabras(marca)
+
+            if marca in lista_marcas:
+                break
+            else:
+                print("Esa marca no está en la lista.")
+                
+            
+
+
+        while True:
+            precio_en_tipo_str = input("Ingrese un precio: ")
+                
+            if "." not in precio_en_tipo_str:
+                print("El valor ingresado no es válido. Por favor, ingrese un número flotante.")
+            else:
+                try:
+                    precio = float(precio_en_tipo_str)
+                    break
+                except ValueError:
+                    print("El valor ingresado no es válido. Por favor, ingrese un número flotante.")
+
+        contador = 0
+
+        while contador < 3:
+            caracteristica = input("Ingrese características del producto: ")
+            caracteristicas.append(caracteristica)
+            contador += 1
+
+            if contador < 3:
+                respuesta = input("Desea seguir ingresando características? (s/n): ")
+                if respuesta.lower() != "s":
+                    break
+        caracteristicas_unidas = "-".join(caracteristicas)
+
+        producto = {
+        "id": id,
+        "nombre": producto,
+        "precio": precio,
+        "marca": marca,
+        "caracteristicas": caracteristicas_unidas
+        }
+
+        lista_insumos.append(producto)
+
+
+
+
+
+# 11
+
+def guardar_datos_en_csv_o_json(lista_insumos:list) -> None:
+
+    """_summary_
+    La funcion valida que la lista no este vacia y sea de tipo list
+    Pide en que formato queremos guardar la lista y valida que sea de tipo csv o json
+    No retorna nada
+    """
+
+    if len(lista_insumos) <= 0 or type(lista_insumos) != list:
+        print("La lista esta vacia o no es de tipo list")
+    else:
+        formato = input("Ingrese un formato: ")
+        nombre = input("Ingrese nombre del archivo, si eligio (formato csv) nombre.csv , si eligio (formato json) nombre.json: ")
+        while formato != "csv" and formato != "json":
+            formato = input("Error.Ingrese un formato correcto: ")
+        if formato == "csv":
+            if not nombre.endswith(".csv"):
+                with open(f"{nombre}", "w",encoding="utf-8") as file:
+                    file.write("id,nombre,marca,precio,caracteristicas\n")
+                    for producto in lista_insumos:
+                        linea = f"{producto['id']},{producto['nombre']},{producto['marca']},{producto['precio']},{producto['caracteristicas']}\n"
+                        file.write(linea)
+        elif formato == "json":
+            if not nombre.endswith(".json"):
+                with open(f"{nombre}", "w") as file:
+                    json.dump(lista_insumos, file, indent=4)
+                print("Los datos se han guardado en formato JSON.")
+        else:
+            print("Formato no válido.")
+        
+
+# 12
 
 def salir() -> bool:
 
