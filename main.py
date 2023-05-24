@@ -54,17 +54,16 @@ while True:
             else:
                 print("Primero debe ingresar a la opcion 1")
         case "9":
-            if bandera and bandera_datos_actualizados:
+            if bandera:
                 actualizar_precios(insumos)
-                bandera_datos_actualizados = False
-
+            
             else:
                 print("Primero debe ingresar a la opcion 1")
         case "10":
-            if bandera or bandera_datos_actualizados == False:
+            if bandera: 
                 agregar_producto(insumos)
         case "11":
-            if bandera or bandera_datos_actualizados == False:
+            if bandera:
                 guardar_datos_en_csv_o_json(insumos)
         case "12":
             if salir():
